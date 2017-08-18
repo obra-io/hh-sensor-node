@@ -1,0 +1,6 @@
+sensor-node_hal_lib/debug/
+sensor-node_hal_lib/.settings/
+sensor-node-timer/debug/
+sensor-node-timer/.settings/
+RemoteSystemsTempFiles/
+.metadata/
