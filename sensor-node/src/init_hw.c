@@ -6,8 +6,7 @@
 
 static TIM_HandleTypeDef handle;
 static CAN_InitTypeDef can_handle;
-static RCC_OscInitTypeDef osc;
-static RCC_ClkInitTypeDef clk;
+
 
 static void init_timer();
 static void init_can();
@@ -18,28 +17,44 @@ static void init_clk();
 
 void init_hw(void)
 {
+	init_clk();
 	init_timer();
 	init_can();
-	init_clk();
+
 }
 
 
 void init_clk(void)
 {
-	osc.OscillatorType = RCC_OSCILLATORTYPE_HSE;
-	osc.HSEState = RCC_HSE_ON;
+	RCC_OscInitTypeDef RCC_OscInitStruct;
+	RCC_ClkInitTypeDef RCC_ClkInitStruct;
 
-	clk.ClockType = RCC_CLOCKTYPE_SYSCLK|RCC_CLOCKTYPE_PCLK1;
-	clk.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;//RCC_CFGR_PLLSRC_HSE_PREDIV.....RCC_SYSCLKSOURCE_HSE
-	clk.AHBCLKDivider = RCC_CFGR_HPRE_DIV2; //<- can be used to divide sys clock
-	clk.APB1CLKDivider = RCC_HCLK_DIV2;
-	__HAL_RCC_PLL_ENABLE();
-	//HAL_RCC_ClockConfig(&clk, FLASH_LATENCY_2);
 
-	uint32_t bob = HAL_RCC_GetSysClockFreq();
-	uint32_t fred = HSE_VALUE;
-	bob++;
-	fred++;
+	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+	RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+	RCC_OscInitStruct.HSICalibrationValue = 16;
+	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+	RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+	RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL6;
+	RCC_OscInitStruct.PLL.PREDIV = RCC_PREDIV_DIV1;
+
+
+	RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK|RCC_CLOCKTYPE_PCLK1;
+	RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+	RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+
+	/**Configure the Systick interrupt time
+	*/
+	HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/1000);
+
+	/**Configure the Systick
+	*/
+	HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
+
+	/* SysTick_IRQn interrupt configuration */
+	HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
+
 }
 
 
@@ -51,8 +66,8 @@ void init_timer(void)
 		__HAL_RCC_TIM2_CLK_ENABLE();
 
 		handle.Instance = TIM2;
-		handle.Init.Prescaler = 1000;
-		handle.Init.Period = 1000;
+		handle.Init.Prescaler = 10;
+		handle.Init.Period = 4800;
 		handle.Init.RepetitionCounter = 0;
 		handle.Init.CounterMode = TIM_COUNTERMODE_UP;
 		handle.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;

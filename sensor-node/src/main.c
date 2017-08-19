@@ -21,9 +21,9 @@ int main(void)
 	init_hw();
 
 	static int i;
-
-	for(;;)
+	uint32_t timerValue;
 	{
+		if(timerValue == 4)
 		i++;
 	}
 }
