@@ -12,21 +12,37 @@
 #include "stm32f0xx.h"
 #include "stm32f0xx_hal_rcc.h"
 #include "stm32f0xx_hal_tim.h"
-#include "init_hw.h"
 
+#include "mcu.h"
 
+static uint8_t ten_ms_loop = 0;
+
+static void ms_loop(void)
+{
+	if(ten_ms_loop<9)
+	{
+		ten_ms_loop++;
+	}
+	else
+	{
+		ten_ms_loop = 0;
+		can_transmit();
+	}
+}
 
 int main(void)
 {
 	init_hw();
 
-	static int i;
-	uint32_t timerValue;
+	while (1)
 	{
-		if(timerValue == 4)
-		i++;
+		if (is_ms_set())
+		{
+			ms_loop();
+		}
 	}
 }
+
 
 
 

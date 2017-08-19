@@ -5,8 +5,11 @@
  extern "C" {
 #endif
 
+#include <stdbool.h>
 
 void init_hw(void);
+bool is_ms_set(void);
+void can_transmit(void);
 
 #ifdef __cplusplus
 }
