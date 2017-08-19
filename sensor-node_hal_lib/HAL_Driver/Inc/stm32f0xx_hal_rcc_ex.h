@@ -1529,7 +1529,6 @@ typedef struct
 
 #if defined(GPIOE)
 
-#define __HAL_RCC_GPIOE_IS_CLK_ENABLED()     ((RCC->AHBENR & (RCC_AHBENR_GPIOEEN)) != RESET)
 #define __HAL_RCC_GPIOE_IS_CLK_DISABLED()    ((RCC->AHBENR & (RCC_AHBENR_GPIOEEN)) == RESET)
 
 #endif /* GPIOE */

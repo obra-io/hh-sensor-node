@@ -17,6 +17,10 @@
 
 static uint8_t ten_ms_loop = 0;
 
+static volatile 	uint8_t  			  timer_flag;
+
+static uint32_t count=0;
+
 static void ms_loop(void)
 {
 	if(ten_ms_loop<9)
@@ -33,16 +37,31 @@ static void ms_loop(void)
 int main(void)
 {
 	init_hw();
-
-	while (1)
+	for(;;)
 	{
-		if (is_ms_set())
+		if(timer_flag == 1)
 		{
-			ms_loop();
+			timer_flag=0;
+			run_1ms_function();
 		}
-	}
+		else
+		{
+			if (count++ == 2000000)
+			{
+
+				count = 0;
+			}
+			run_fast_function();
+			// call can process pending function
+		}
 }
 
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	timer_flag = 1;
+
+}
 
 
 
