@@ -11,6 +11,7 @@
 #include "stm32f0xx.h"
 #include "stm32f0xx_hal_rcc.h"
 #include "stm32f0xx_hal_tim.h"
+#include "stm32f0xx_hal_can.h"
 
 #include "mcu.h"
 /* peripheral files ---------------------------------------------------------*/
@@ -33,7 +34,6 @@ int main(void)
 
 	//enable interrupts
 	HAL_NVIC_SetPriority(TIM2_IRQn, 0, 0);
-	HAL_NVIC_EnableIRQ(TIM2_IRQn);
 	for(;;)
 	{
 		if(scheduler==3)
@@ -73,7 +73,6 @@ void init_timer(void)
 		if (hal_status == HAL_OK)
 		{
 			NVIC_EnableIRQ(TIM2_IRQn);
-
 			HAL_TIM_Base_Start_IT(&handle);
 		}
 }

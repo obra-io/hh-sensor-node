@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file    main.c
+  * @file    mcu.c
   * @author  Craig, Prem
   * @version V1.0
   * @date    20-May-2017
@@ -28,8 +28,6 @@ static CanTxMsgTypeDef can_out;
 
 static CanTxMsgTypeDef        TxMessage;
 static CanRxMsgTypeDef        RxMessage;
-
-static bool ms_flag = 0;
 
 static volatile uint8_t can_rcv_flag;
 
@@ -104,47 +102,47 @@ void init_clk(void)
 	can_gpio.Alternate = GPIO_AF4_CAN;
 	HAL_GPIO_Init(GPIOA, &can_gpio);
 
-	 can_handle.Instance = CAN;
-	 can_handle.Init.Mode = CAN_MODE_NORMAL;
-	 can_handle.Init.Prescaler = 12;
-	 can_handle.Init.SJW = CAN_SJW_1TQ;
-	 can_handle.Init.BS1 = CAN_BS1_13TQ;
-	 can_handle.Init.BS2 = CAN_BS2_2TQ;
-	 can_handle.Init.TTCM = DISABLE;
-	 can_handle.Init.ABOM = DISABLE;
-	 can_handle.Init.AWUM = DISABLE;
-	 can_handle.Init.NART = DISABLE;
-	 can_handle.Init.RFLM = DISABLE;
-	 can_handle.Init.TXFP = DISABLE;
-	 can_handle.pTxMsg = &TxMessage;
-	 can_handle.pRxMsg = &RxMessage;
-	 CAN_FilterConfTypeDef  		  sFilterConfig;
-	 //CAN_Init(CAN1, &can_handle);
-	 if(HAL_CAN_Init(&can_handle)!=HAL_OK)
-		{
-		 while(1);
-		}
+	can_handle.Instance = CAN;
+	can_handle.Init.Mode = CAN_MODE_NORMAL;
+	can_handle.Init.Prescaler = 12;
+	can_handle.Init.SJW = CAN_SJW_1TQ;
+	can_handle.Init.BS1 = CAN_BS1_13TQ;
+	can_handle.Init.BS2 = CAN_BS2_2TQ;
+	can_handle.Init.TTCM = DISABLE;
+	can_handle.Init.ABOM = DISABLE;
+	can_handle.Init.AWUM = DISABLE;
+	can_handle.Init.NART = DISABLE;
+	can_handle.Init.RFLM = DISABLE;
+	can_handle.Init.TXFP = DISABLE;
+	can_handle.pTxMsg = &TxMessage;
+	can_handle.pRxMsg = &RxMessage;
+	CAN_FilterConfTypeDef  		  sFilterConfig;
 
-	 sFilterConfig.FilterNumber = 0;
-	 sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
-	 sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
-	 sFilterConfig.FilterIdHigh = 0x0000;
-	 sFilterConfig.FilterIdLow = 0x0000;
-	 sFilterConfig.FilterMaskIdHigh = 0x0000;
-	 sFilterConfig.FilterMaskIdLow = 0x0000;
-	 sFilterConfig.FilterFIFOAssignment = 0;
-	 sFilterConfig.FilterActivation = ENABLE;
-	 sFilterConfig.BankNumber = 14;
+	if(HAL_CAN_Init(&can_handle)!=HAL_OK)
+	{
+	while(1);
+	}
 
-	 if(HAL_CAN_ConfigFilter(&can_handle, &sFilterConfig) != HAL_OK)
-	  {
-		 while(1);
-	  }
+	sFilterConfig.FilterNumber = 0;
+	sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
+	sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
+	sFilterConfig.FilterIdHigh = 0x0000;
+	sFilterConfig.FilterIdLow = 0x0000;
+	sFilterConfig.FilterMaskIdHigh = 0x0000;
+	sFilterConfig.FilterMaskIdLow = 0x0000;
+	sFilterConfig.FilterFIFOAssignment = 0;
+	sFilterConfig.FilterActivation = ENABLE;
+	sFilterConfig.BankNumber = 14;
 
-	 //## 1 Configure the CAN peripheral //
-	 HAL_CAN_Init(&can_handle);
-	 HAL_CAN_Receive_IT(&can_handle,0);
-	 HAL_CAN_Transmit_IT(&can_handle);
+	if(HAL_CAN_ConfigFilter(&can_handle, &sFilterConfig) != HAL_OK)
+	{
+	while(1);
+	}
+
+	//## 1 Configure the CAN peripheral //
+	HAL_CAN_Init(&can_handle);
+	HAL_CAN_Receive_IT(&can_handle,0);
+	HAL_CAN_Transmit_IT(&can_handle);
 }
 
 
@@ -162,7 +160,7 @@ void init_can_message(void)
 
 void can_transmit(void)
 {
-	HAL_CAN_Transmit_IT(&can_handle);
+	CAN_Transmit_IT(&can_handle);
 }
 
 
@@ -181,10 +179,6 @@ void CAN1_TX_IRQHandler(void)
 	HAL_CAN_IRQHandler(&can_handle);
 }
 
-void HAL_CAN_TxCpltCallback(CAN_HandleTypeDef* hcan)
-{
-
-}
 void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan)
 {
 
