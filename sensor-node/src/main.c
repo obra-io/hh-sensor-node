@@ -17,7 +17,7 @@
 /* peripheral files ---------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 
-static 			uint8_t 			scheduler=0;
+static volatile	uint8_t 			scheduler;
 static volatile uint8_t  			timer_flag;
 static 			TIM_HandleTypeDef 	handle;
 static 			uint32_t 			count=0;
@@ -34,20 +34,18 @@ int main(void)
 	HAL_NVIC_SetPriority(TIM2_IRQn, 0, 0);
 	for(;;)
 	{
-		if(scheduler==3)
-			scheduler=0;
 		switch(scheduler)
 		{
-		case 1:
+		case 10:
+			timer_flag=0;
 			can_transmit();
-			break;
-		case 2:
+		break;
+		case 20:
 			break;
 		default:
 			if(timer_flag ==1)
 			{
 				timer_flag =0;
-				scheduler++;
 			}
 		}
 	}
@@ -83,4 +81,12 @@ void TIM2_IRQHandler(void)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	timer_flag = 1;
+	if(scheduler==21)
+		{
+		scheduler=0;
+		}
+	else
+		{
+		scheduler++;
+		}
 }

@@ -46,14 +46,12 @@ struct can_msg{
 
 struct can_msg pend_msgs[5];
 
-
 void init_hw(void)
 {
 	init_clk();
 	init_can();
 	init_can_message();
 }
-
 
 void init_clk(void)
 {
@@ -147,8 +145,6 @@ void init_clk(void)
 	HAL_CAN_Transmit_IT(&can_handle);
 }
 
-
-
 void init_can_message(void)
 {
 	can_out.StdId = 0x33;
@@ -159,12 +155,11 @@ void init_can_message(void)
 	can_out.Data[7] = 5;
 }
 
-
 void can_transmit(void)
 {
-	CAN_Transmit_IT(&can_handle);
+	send_can_msg(0x111);
+	HAL_CAN_Transmit_IT(&can_handle);
 }
-
 
 void CAN1_RX0_IRQHandler(void)
 {
@@ -227,7 +222,7 @@ void process_can_msg(struct can_msg *msg){
 static void send_can_msg(uint32_t msg_id)
 {
 	uint8_t buff [12];
-	get_msg_data(msg_id, buff);		// fill the first 4 bytes woith can ID last 8 with data
+	get_msg_data(msg_id, buff);		// fill the first 4 bytes with can ID last 8 with data
 	can_handle.pTxMsg->StdId = buff[0] | ((buff[1] & 0x07)<<8U);  // first byte line up with the id to make 11 bits we need another 3 bits of the second byte
 	// U indicated its unsigned
 	can_handle.pTxMsg->RTR = CAN_RTR_DATA;		// look at this
@@ -237,4 +232,7 @@ static void send_can_msg(uint32_t msg_id)
 	HAL_CAN_Transmit_IT(&can_handle);
 }
 
+void get_msg_data(uint32_t msg_id, uint8_t buff [12])
+{
 
+}
