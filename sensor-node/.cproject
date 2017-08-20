@@ -75,6 +75,12 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
+					<fileInfo id="fr.ac6.managedbuild.config.gnu.cross.exe.debug.630544166.1795683759" name="mcu.c" rcbsApplicability="disable" resourcePath="src/mcu.c" toolsToInvoke="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.909216641.1345607129">
+						<tool id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.909216641.1345607129" name="MCU GCC Compiler" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.909216641">
+							<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c.1161280063" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c"/>
+							<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s.2039228646" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s"/>
+						</tool>
+					</fileInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="inc"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>

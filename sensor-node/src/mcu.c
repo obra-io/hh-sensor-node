@@ -1,3 +1,14 @@
+/**
+  ******************************************************************************
+  * @file    main.c
+  * @author  Craig, Prem
+  * @version V1.0
+  * @date    20-May-2017
+  * @brief   main function for task scheduling
+  ******************************************************************************
+*/
+
+
 #include <stdbool.h>
 
 #include "stm32f0xx.h"
@@ -6,14 +17,14 @@
 #include "stm32f0xx_hal_rcc.h"
 #include "can.h"
 #include <string.h>
+/* peripheral files ---------------------------------------------------------*/
+/* Private variables ---------------------------------------------------------*/
 
-
-static TIM_HandleTypeDef handle;
 CAN_HandleTypeDef can_handle;
 static RCC_OscInitTypeDef osc;
 static RCC_ClkInitTypeDef clk;
 static CanTxMsgTypeDef can_out;
-
+/* Private function prototypes -----------------------------------------------*/
 
 static CanTxMsgTypeDef        TxMessage;
 static CanRxMsgTypeDef        RxMessage;
@@ -22,7 +33,6 @@ static bool ms_flag = 0;
 
 static volatile uint8_t can_rcv_flag;
 
-static void init_timer();
 static void init_can();
 static void init_clk();
 static void init_can_message();
@@ -39,18 +49,13 @@ struct can_msg pend_msgs[5];
 void init_hw(void)
 {
 	init_clk();
-	init_timer();
 	init_can();
 	init_can_message();
-	int i = 0;
-	i++;
 }
 
 
 void init_clk(void)
 {
-
-
 	osc.OscillatorType = RCC_OSCILLATORTYPE_HSI;
 	osc.HSIState = RCC_HSI_ON;
 	osc.HSICalibrationValue = 16;
@@ -65,49 +70,15 @@ void init_clk(void)
 	clk.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	clk.APB1CLKDivider = RCC_HCLK_DIV1;
 
-	/**Configure the Systick interrupt time
-	*/
+	/**Configure the Systick interrupt time*/
 	HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/1000);
 
-	/**Configure the Systick
-	*/
+	/**Configure the Systick*/
 	HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
 
 	/* SysTick_IRQn interrupt configuration */
 	HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
-
 }
-
-
-
-void init_timer(void)
-{
-	HAL_StatusTypeDef hal_status;
-
-		__HAL_RCC_TIM2_CLK_ENABLE();
-
-		handle.Instance = TIM2;
-		handle.Init.Prescaler = 10;
-		handle.Init.Period = 4800;
-		handle.Init.RepetitionCounter = 0;
-		handle.Init.CounterMode = TIM_COUNTERMODE_UP;
-		handle.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-
-		hal_status = HAL_TIM_Base_Init(&handle);
-
-		HAL_TIM_Base_Init(&handle);
-
-	    HAL_TIM_Base_Start_IT(&handle);
-
-		if (hal_status == HAL_OK)
-		{
-			NVIC_EnableIRQ(TIM2_IRQn);
-
-			HAL_TIM_Base_Start_IT(&handle);
-		}
-}
-
-
 
 
  void init_can(void)
@@ -186,7 +157,6 @@ void init_can_message(void)
 	can_out.RTR = CAN_RTR_DATA;
 	can_out.DLC = 8;
 	can_out.Data[7] = 5;
-
 }
 
 
@@ -195,26 +165,6 @@ void can_transmit(void)
 	HAL_CAN_Transmit_IT(&can_handle);
 }
 
-
-bool is_ms_set(void)
-{
-	bool set = false;
-
-	if (ms_flag)
-	{
-		set = true;
-		ms_flag = false;
-	}
-
-	return set;
-}
-
-
-void TIM2_IRQHandler(void)
-{
-	HAL_TIM_IRQHandler(&handle);
-	ms_flag = true;
-}
 
 void CAN1_RX0_IRQHandler(void)
 {
@@ -279,8 +229,5 @@ void process_can_msg(struct can_msg *msg){
 }
 
 
-void TIM2_IRQHandler(void)
-{
-	HAL_TIM_IRQHandler(&handle);
-}
+
 

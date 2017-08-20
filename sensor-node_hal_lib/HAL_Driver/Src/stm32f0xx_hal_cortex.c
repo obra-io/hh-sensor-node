@@ -142,7 +142,7 @@
   * @brief  Sets the priority of an interrupt.
   * @param  IRQn: External interrupt number .
   *         This parameter can be an enumerator of IRQn_Type enumeration
-  *         (For the complete STM32 Devices IRQ Channels list, please refer to stm32l0xx.h file)
+  *         (For the complete STM32 Devices IRQ Channels list, please refer to stm32l0xx.h file)1
   * @param  PreemptPriority: The preemption priority for the IRQn channel.
   *         This parameter can be a value between 0 and 3.
   *         A lower priority value indicates a higher priority
