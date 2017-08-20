@@ -12,8 +12,8 @@
 #include "stm32f0xx_hal_rcc.h"
 #include "stm32f0xx_hal_tim.h"
 #include "stm32f0xx_hal_can.h"
-
 #include "mcu.h"
+
 /* peripheral files ---------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 
@@ -22,10 +22,8 @@ static volatile uint8_t  			timer_flag;
 static 			TIM_HandleTypeDef 	handle;
 static 			uint32_t 			count=0;
 
-
 /* Private function prototypes -----------------------------------------------*/
 void init_timer(void);
-
 
 int main(void)
 {
@@ -76,7 +74,6 @@ void init_timer(void)
 			HAL_TIM_Base_Start_IT(&handle);
 		}
 }
-
 
 void TIM2_IRQHandler(void)
 {

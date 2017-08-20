@@ -15,19 +15,22 @@
 #include "stm32f0xx_hal_tim.h"
 #include "stm32f0xx_hal_can.h"
 #include "stm32f0xx_hal_rcc.h"
-#include "can.h"
+#include "mcu.h"
 #include <string.h>
 /* peripheral files ---------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 
-CAN_HandleTypeDef can_handle;
-static RCC_OscInitTypeDef osc;
-static RCC_ClkInitTypeDef clk;
-static CanTxMsgTypeDef can_out;
+CAN_HandleTypeDef 				can_handle;
+static RCC_OscInitTypeDef 		osc;
+static RCC_ClkInitTypeDef 		clk;
+static CanTxMsgTypeDef 			can_out;
+static CanTxMsgTypeDef 			TxMessage;
+static CanRxMsgTypeDef 			RxMessage;
+
 /* Private function prototypes -----------------------------------------------*/
 
-static CanTxMsgTypeDef        TxMessage;
-static CanRxMsgTypeDef        RxMessage;
+
+static void 	send_can_msg(uint32_t msg_id);
 
 static volatile uint8_t can_rcv_flag;
 
@@ -77,7 +80,6 @@ void init_clk(void)
 	/* SysTick_IRQn interrupt configuration */
 	HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 }
-
 
  void init_can(void)
  {
@@ -222,6 +224,17 @@ void process_can_msg(struct can_msg *msg){
 	// use the id of the can message to figure which table data to update
 }
 
-
+static void send_can_msg(uint32_t msg_id)
+{
+	uint8_t buff [12];
+	get_msg_data(msg_id, buff);		// fill the first 4 bytes woith can ID last 8 with data
+	can_handle.pTxMsg->StdId = buff[0] | ((buff[1] & 0x07)<<8U);  // first byte line up with the id to make 11 bits we need another 3 bits of the second byte
+	// U indicated its unsigned
+	can_handle.pTxMsg->RTR = CAN_RTR_DATA;		// look at this
+	can_handle.pTxMsg->IDE = CAN_ID_STD;			//
+	can_handle.pTxMsg->DLC = 8;
+	memcpy(can_handle.pRxMsg->Data,&buff[4],8);
+	HAL_CAN_Transmit_IT(&can_handle);
+}
 
 
