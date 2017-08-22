@@ -7,11 +7,8 @@
 
 #include <stdbool.h>
 
-
-
 void init_hw(void);
-bool is_ms_set(void);
-void can_transmit(void);
+void send_can_msg (uint16_t adc_8,uint8_t num_of_bytes,uint8_t can_id);
 
 #ifdef __cplusplus
 }
