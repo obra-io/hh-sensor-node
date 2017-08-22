@@ -144,7 +144,6 @@ void init_clk(void)
 
 	//## 1 Configure the CAN peripheral //
 	HAL_CAN_Init(&can_handle);
-	HAL_CAN_IRQHandler(&can_handle);
 //	HAL_CAN_Receive_IT(&can_handle,0);
 //	HAL_CAN_Transmit_IT(&can_handle);
 }
@@ -232,13 +231,20 @@ void send_can_msg(uint16_t adc_8,uint8_t num_of_bytes,uint8_t can_id)
 	uint16_t local_adc=adc_8;
 	buff[2] = ((local_adc >>8)& 0xff);
 	buff[3] = ((local_adc >>0)& 0xff);
-	can_handle.pTxMsg->StdId = 0x055; // first byte line up with the id to make 11 bits
+//	can_handle.pTxMsg->StdId = 0x055; // first byte line up with the id to make 11 bits
+//	can_handle.pTxMsg->RTR = CAN_RTR_DATA;
+//	can_handle.pTxMsg->IDE = buff[0] | ((buff[1] & 0x07)<<8U);
+//	can_handle.pTxMsg->DLC = num_of_bytes;
+	can_handle.pTxMsg->IDE = CAN_ID_STD;
 	can_handle.pTxMsg->RTR = CAN_RTR_DATA;
-	can_handle.pTxMsg->IDE = buff[0] | ((buff[1] & 0x07)<<8U);
-	can_handle.pTxMsg->DLC = num_of_bytes;
-	memcpy(can_handle.pTxMsg->Data ,&buff[2],num_of_bytes);
-	//memcpy(can_handle.pRxMsg->Data,&buff[4],8);
+	can_handle.pTxMsg->DLC = 8;
+	can_handle.pTxMsg->StdId = 0x11;
+	can_handle.pTxMsg->ExtId = 0x0;
+	memcpy(can_handle.pTxMsg->Data ,&buff[0],8);
 	HAL_CAN_Transmit_IT(&can_handle);
+	//memcpy(can_handle.pRxMsg->Data ,&buff[4],8);
+	//memcpy(can_handle.pRxMsg->Data,&buff[4],8);
+
 }
 /*
 void get_msg_data(uint32_t msg_id, uint8_t buff [12])

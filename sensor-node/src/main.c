@@ -37,13 +37,14 @@ int main(void)
 	//enable interrupts
 	HAL_NVIC_SetPriority(TIM2_IRQn, 0, 0);
 	HAL_NVIC_SetPriority(CEC_CAN_IRQn,1,1);
+	HAL_ADC_Start(&g_AdcHandle);
 	for(;;)
 	{
 		switch(scheduler)
 		{
 		case 1:
 			timer_flag =0;
-			if (HAL_ADC_PollForConversion(&g_AdcHandle, 20) == HAL_OK)
+			if (HAL_ADC_PollForConversion(&g_AdcHandle, 10) == HAL_OK)
 				{
 					g_ADCValue = HAL_ADC_GetValue(&g_AdcHandle);
 				}
@@ -65,7 +66,7 @@ void init_timer(void)
 		__HAL_RCC_TIM2_CLK_ENABLE();
 
 		handle.Instance = TIM2;
-		handle.Init.Prescaler = 10;
+		handle.Init.Prescaler = 100;
 		handle.Init.Period = 4800;
 		handle.Init.RepetitionCounter = 0;
 		handle.Init.CounterMode = TIM_COUNTERMODE_UP;
@@ -88,13 +89,13 @@ void TIM2_IRQHandler(void)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	timer_flag = 1;
-	if(scheduler==4)
+	if(scheduler<4)
 		{
-			scheduler=0;
+			scheduler++;
 		}
 	else
 		{
-			scheduler++;
+			scheduler=0;
 		}
 }
 
@@ -111,9 +112,6 @@ static void adc_channel_init(void)
 	gpioInit.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOC, &gpioInit);
 
-	HAL_NVIC_SetPriority(ADC1_IRQn, 0, 0);
-	HAL_NVIC_EnableIRQ(ADC1_IRQn);
-
 	ADC_ChannelConfTypeDef adcChannel;
 
 	g_AdcHandle.Instance = ADC1;
@@ -124,12 +122,12 @@ static void adc_channel_init(void)
 	g_AdcHandle.Init.DiscontinuousConvMode = DISABLE;
 	g_AdcHandle.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
 	g_AdcHandle.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-	g_AdcHandle.Init.DMAContinuousRequests = ENABLE;
-	g_AdcHandle.Init.EOCSelection = DISABLE;
+	g_AdcHandle.Init.DMAContinuousRequests = DISABLE;
+	g_AdcHandle.Init.EOCSelection = ENABLE;
 
 	adcChannel.Channel = ADC_CHANNEL_0;
 	adcChannel.Rank = 1;
-	adcChannel.SamplingTime = ADC_SAMPLETIME_239CYCLES_5;
+	adcChannel.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
 	HAL_ADC_Init(&g_AdcHandle);
 	HAL_ADC_ConfigChannel(&g_AdcHandle, &adcChannel);
 
