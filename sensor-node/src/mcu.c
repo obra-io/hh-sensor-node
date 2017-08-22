@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file    mcu.c
+  * @file    mcu.c - commit to head
   * @author  Craig, Prem
   * @version V1.0
   * @date    20-May-2017
@@ -26,9 +26,14 @@ static RCC_ClkInitTypeDef 		clk;
 static CanTxMsgTypeDef 			can_out;
 static CanTxMsgTypeDef 			TxMessage;
 static CanRxMsgTypeDef 			RxMessage;
+static volatile uint8_t 		tx_done;
+
 
 /* Private function prototypes -----------------------------------------------*/
+
+
 void 	send_can_msg(uint16_t adc_8,uint8_t num_of_bytes,uint8_t can_id);
+
 
 static volatile uint8_t can_rcv_flag;
 
@@ -139,14 +144,9 @@ void init_clk(void)
 
 	//## 1 Configure the CAN peripheral //
 	HAL_CAN_Init(&can_handle);
-<<<<<<< HEAD
-	HAL_CAN_Receive_IT(&can_handle,0);
-	HAL_CAN_Transmit_IT(&can_handle);
-=======
-	NVIC_EnableIRQ(CEC_CAN_IRQn);
-	HAL_CAN_Receive_IT(&can_handle,0);
-
->>>>>>> fded14d... ADC-CAN message test
+	HAL_CAN_IRQHandler(&can_handle);
+//	HAL_CAN_Receive_IT(&can_handle,0);
+//	HAL_CAN_Transmit_IT(&can_handle);
 }
 
 void init_can_message(void)
@@ -159,22 +159,15 @@ void init_can_message(void)
 	can_out.Data[7] = 5;
 }
 
-<<<<<<< HEAD
-void can_transmit(void)
-{
-	send_can_msg(0x111);
-	HAL_CAN_Transmit_IT(&can_handle);
-}
 
-void CAN1_RX0_IRQHandler(void)
-=======
+
 void CEC_IRQHandler(void)
->>>>>>> fded14d... ADC-CAN message test
 {
 	HAL_CAN_IRQHandler(&can_handle);
 }
 
-<<<<<<< HEAD
+
+/*
 void CAN1_RX1_IRQHandler(void)
 {
 	HAL_CAN_IRQHandler(&can_handle);
@@ -183,10 +176,9 @@ void CAN1_RX1_IRQHandler(void)
 void CAN1_TX_IRQHandler(void)
 {
 	HAL_CAN_IRQHandler(&can_handle);
-}
+}*/
 
-=======
->>>>>>> fded14d... ADC-CAN message test
+
 void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan)
 {
 
@@ -207,6 +199,13 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
 	can_rcv_flag = 1;
 }
 
+
+void process_can_msg(struct can_msg *msg){
+	msg->ready = 0;
+	// create another file can protocol
+	// build a giant table for all the data that comes on the can bus
+	// use the id of the can message to figure which table data to update
+}
 //processing interrupts
 void can_loop(void)
 {
@@ -223,32 +222,11 @@ void can_loop(void)
 	}
 }
 
-void process_can_msg(struct can_msg *msg){
-	msg->ready = 0;
-	// create another file can protocol
-	// build a giant table for all the data that comes on the can bus
-	// use the id of the can message to figure which table data to update
-}
+
 
 void send_can_msg(uint16_t adc_8,uint8_t num_of_bytes,uint8_t can_id)
 {
-
 	uint8_t buff [12];
-<<<<<<< HEAD
-	get_msg_data(msg_id, buff);		// fill the first 4 bytes with can ID last 8 with data
-	can_handle.pTxMsg->StdId = buff[0] | ((buff[1] & 0x07)<<8U);  // first byte line up with the id to make 11 bits we need another 3 bits of the second byte
-	// U indicated its unsigned
-	can_handle.pTxMsg->RTR = CAN_RTR_DATA;		// look at this
-	can_handle.pTxMsg->IDE = CAN_ID_STD;			//
-	can_handle.pTxMsg->DLC = 8;
-	memcpy(can_handle.pRxMsg->Data,&buff[4],8);
-	HAL_CAN_Transmit_IT(&can_handle);
-}
-
-void get_msg_data(uint32_t msg_id, uint8_t buff [12])
-{
-
-=======
 	buff[0] = can_id;
 	buff[1] = 0x0;
 	uint16_t local_adc=adc_8;
@@ -262,9 +240,15 @@ void get_msg_data(uint32_t msg_id, uint8_t buff [12])
 	//memcpy(can_handle.pRxMsg->Data,&buff[4],8);
 	HAL_CAN_Transmit_IT(&can_handle);
 }
+/*
+void get_msg_data(uint32_t msg_id, uint8_t buff [12])
+{
+
+}
+*/
 
 void HAL_CAN_TxCpltCallback(CAN_HandleTypeDef* hcan)
 {
 	tx_done = 1; // if I write my own ISR fucntion then I need to clear the interrupt
->>>>>>> fded14d... ADC-CAN message test
+
 }
