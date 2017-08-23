@@ -93,24 +93,24 @@ void init_clk(void)
 
 	can_gpio.Pin = GPIO_PIN_11; 				// can rx
 	can_gpio.Mode = GPIO_MODE_AF_PP;
-	can_gpio.Pull = GPIO_PULLUP;
-	can_gpio.Speed = GPIO_SPEED_FREQ_HIGH;
+	can_gpio.Pull = GPIO_NOPULL;
+	can_gpio.Speed = GPIO_SPEED_FREQ_LOW;
 	can_gpio.Alternate = GPIO_AF4_CAN;
 	HAL_GPIO_Init(GPIOA, &can_gpio);
 
 	can_gpio.Pin = GPIO_PIN_12;				// can tx
 	can_gpio.Mode = GPIO_MODE_AF_PP;
-	can_gpio.Pull = GPIO_PULLUP;
-	can_gpio.Speed = GPIO_SPEED_FREQ_HIGH;
+	can_gpio.Pull = GPIO_NOPULL;
+	can_gpio.Speed = GPIO_SPEED_FREQ_LOW;
 	can_gpio.Alternate = GPIO_AF4_CAN;
 	HAL_GPIO_Init(GPIOA, &can_gpio);
 
 	can_handle.Instance = CAN;
 	can_handle.Init.Mode = CAN_MODE_NORMAL;
-	can_handle.Init.Prescaler = 12;
+	can_handle.Init.Prescaler = 1;
 	can_handle.Init.SJW = CAN_SJW_1TQ;
-	can_handle.Init.BS1 = CAN_BS1_13TQ;
-	can_handle.Init.BS2 = CAN_BS2_2TQ;
+	can_handle.Init.BS1 = CAN_BS1_11TQ;
+	can_handle.Init.BS2 = CAN_BS2_4TQ;
 	can_handle.Init.TTCM = DISABLE;
 	can_handle.Init.ABOM = DISABLE;
 	can_handle.Init.AWUM = DISABLE;
@@ -144,8 +144,8 @@ void init_clk(void)
 
 	//## 1 Configure the CAN peripheral //
 	HAL_CAN_Init(&can_handle);
-//	HAL_CAN_Receive_IT(&can_handle,0);
-//	HAL_CAN_Transmit_IT(&can_handle);
+	NVIC_EnableIRQ(CEC_CAN_IRQn);
+	HAL_CAN_Receive_IT(&can_handle,0);
 }
 
 void init_can_message(void)
@@ -180,6 +180,7 @@ void CAN1_TX_IRQHandler(void)
 
 void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan)
 {
+
 
 }
 
@@ -222,7 +223,6 @@ void can_loop(void)
 }
 
 
-
 void send_can_msg(uint16_t adc_8,uint8_t num_of_bytes,uint8_t can_id)
 {
 	uint8_t buff [12];
@@ -235,12 +235,13 @@ void send_can_msg(uint16_t adc_8,uint8_t num_of_bytes,uint8_t can_id)
 //	can_handle.pTxMsg->RTR = CAN_RTR_DATA;
 //	can_handle.pTxMsg->IDE = buff[0] | ((buff[1] & 0x07)<<8U);
 //	can_handle.pTxMsg->DLC = num_of_bytes;
+	can_handle.pTxMsg->StdId = 0x55;
+	can_handle.pTxMsg->ExtId = 0x0;
 	can_handle.pTxMsg->IDE = CAN_ID_STD;
 	can_handle.pTxMsg->RTR = CAN_RTR_DATA;
 	can_handle.pTxMsg->DLC = 8;
-	can_handle.pTxMsg->StdId = 0x11;
-	can_handle.pTxMsg->ExtId = 0x0;
 	memcpy(can_handle.pTxMsg->Data ,&buff[0],8);
+	//can_handle.pTxMsg->Data = 0x55;
 	HAL_CAN_Transmit_IT(&can_handle);
 	//memcpy(can_handle.pRxMsg->Data ,&buff[4],8);
 	//memcpy(can_handle.pRxMsg->Data,&buff[4],8);

@@ -35,7 +35,7 @@ int main(void)
 	init_timer();	// Initialize timer
 	adc_channel_init();
 	//enable interrupts
-	HAL_NVIC_SetPriority(TIM2_IRQn, 0, 0);
+	HAL_NVIC_SetPriority(TIM2_IRQn, 1, 0);
 	HAL_NVIC_SetPriority(CEC_CAN_IRQn,1,1);
 	HAL_ADC_Start(&g_AdcHandle);
 	for(;;)
