@@ -94,19 +94,19 @@ void init_clk(void)
 	can_gpio.Pin = GPIO_PIN_11; 				// can rx
 	can_gpio.Mode = GPIO_MODE_AF_PP;
 	can_gpio.Pull = GPIO_NOPULL;
-	can_gpio.Speed = GPIO_SPEED_FREQ_LOW;
+	can_gpio.Speed = GPIO_SPEED_FREQ_HIGH;
 	can_gpio.Alternate = GPIO_AF4_CAN;
 	HAL_GPIO_Init(GPIOA, &can_gpio);
 
 	can_gpio.Pin = GPIO_PIN_12;				// can tx
 	can_gpio.Mode = GPIO_MODE_AF_PP;
 	can_gpio.Pull = GPIO_NOPULL;
-	can_gpio.Speed = GPIO_SPEED_FREQ_LOW;
+	can_gpio.Speed = GPIO_SPEED_FREQ_HIGH;
 	can_gpio.Alternate = GPIO_AF4_CAN;
 	HAL_GPIO_Init(GPIOA, &can_gpio);
 
 	can_handle.Instance = CAN;
-	can_handle.Init.Mode = CAN_MODE_NORMAL;
+	can_handle.Init.Mode = CAN_MODE_LOOPBACK;
 	can_handle.Init.Prescaler = 1;
 	can_handle.Init.SJW = CAN_SJW_1TQ;
 	can_handle.Init.BS1 = CAN_BS1_11TQ;
@@ -135,7 +135,7 @@ void init_clk(void)
 	sFilterConfig.FilterMaskIdLow = 0x0000;
 	sFilterConfig.FilterFIFOAssignment = 0;
 	sFilterConfig.FilterActivation = ENABLE;
-	sFilterConfig.BankNumber = 14;
+	sFilterConfig.BankNumber = 0;
 
 	if(HAL_CAN_ConfigFilter(&can_handle, &sFilterConfig) != HAL_OK)
 	{
@@ -145,7 +145,7 @@ void init_clk(void)
 	//## 1 Configure the CAN peripheral //
 	HAL_CAN_Init(&can_handle);
 	NVIC_EnableIRQ(CEC_CAN_IRQn);
-	HAL_CAN_Receive_IT(&can_handle,0);
+	//HAL_CAN_Receive_IT(&can_handle,0);
 }
 
 void init_can_message(void)
@@ -257,5 +257,4 @@ void get_msg_data(uint32_t msg_id, uint8_t buff [12])
 void HAL_CAN_TxCpltCallback(CAN_HandleTypeDef* hcan)
 {
 	tx_done = 1; // if I write my own ISR fucntion then I need to clear the interrupt
-
 }

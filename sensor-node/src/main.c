@@ -31,7 +31,7 @@ static void adc_channel_init(void);
 
 int main(void)
 {
-	init_hw();	//Initialize hardware
+	init_hw();	//Initialize bhardware
 	init_timer();	// Initialize timer
 	adc_channel_init();
 	//enable interrupts
